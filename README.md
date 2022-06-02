@@ -1,70 +1,112 @@
-# Getting Started with Create React App
+## Controlled Component & Uncontrolled Component
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+#### 상태를 가지고 있는 엘리먼트
 
-## Available Scripts
+- input
+- select
+- textarea
 
-In the project directory, you can run:
+엘리먼트의 상태를 누가 관리하느냐에 따라
 
-### `npm start`
+- Controlled : 엘리먼트가 가지고 있는 컴포넌트가 관리
+- Uncontrolled : 엘리먼트의 상태를 관리하지 않고, 엘리먼트의 참조만 컴포넌트가 소유
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+#### ControlledComponent.jsx
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```jsx
+import React from "react";
 
-### `npm test`
+class ControlledComponent extends React.Component {
+  state = {
+    value: "",
+  };
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+  render() {
+    const { value } = this.state;
+    return (
+      <div>
+        <input value={value} onChange={this.change} />
+        <button onClick={this.click}>전송</button>
+      </div>
+    );
+  }
 
-### `npm run build`
+  change = (e) => {
+    //console.log(e.target.value);
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+    // 바뀐 값을 넣으려면 다시 렌더해줘야 한다.
+    this.setState({ value: e.target.value });
+  };
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+  click = () => {
+    // input에 넣은 텍스트 보내기
+    console.log(this.state.value);
+  };
+}
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+export default ControlledComponent;
+```
 
-### `npm run eject`
+#### UncontrolledComponent.jsx
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+React에서 지향하는 방법 : Ref에서 가지고 있다가 사용함 **inputRef = React.createRef();**
+React에서 지양하는 방식 : 실제 DOM에 접근해서 사용
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+```jsx
+import React from "react";
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+class UncontrolledComponent extends React.Component {
+  // React에서 지향하는 방법 : Ref에서 가지고 있다가 사용함
+  inputRef = React.createRef();
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+  render() {
+    console.log("initial render", this.inputRef);
+    return (
+      <div>
+        {/* <input id="my-input" /> */}
+        <input ref={this.inputRef} />
+        <button onClick={this.click}>전송</button>
+      </div>
+    );
+  }
 
-## Learn More
+  conponentDidMount() {
+    console.log("conponentDidMount", this.inputRef);
+  }
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+  click = () => {
+    // React에서 지양하는 방식 : 실제 DOM에 접근해서 사용
+    // input 엘리먼트의 현재 상태값을 꺼내서 전송하기
+    // const input = document.querySelector("#my-input");
+    // console.log(input.value);
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+    // React에서 지향하는 방식 : 필요할 때만 꺼내쓸 수 있다.
+    console.log(this.inputRef.current.value);
+  };
+}
 
-### Code Splitting
+export default UncontrolledComponent;
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+#### App.js
 
-### Analyzing the Bundle Size
+```js
+import logo from "./logo.svg";
+import "./App.css";
+import ControlledComponent from "./components/ControlledComponent";
+import UncontrolledComponent from "./components/UncontrolledComponent";
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+function App() {
+  return (
+    <div className="App">
+      <header className="App-header">
+        <img src={logo} className="App-logo" alt="logo" />
+        <ControlledComponent />
+        <UncontrolledComponent />
+      </header>
+    </div>
+  );
+}
 
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+export default App;
+```
